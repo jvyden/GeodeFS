@@ -5,7 +5,8 @@ using GeodeFS.Server.Configuration;
 using GeodeFS.Server.Services;
 using NotEnoughLogs.Behaviour;
 
-FederationController controller = new(new NullNetworkBackend());
+FederationController controller = new(new TcpNetworkBackend());
+// controller.HandshakeWithNode("127.0.0.1");
 
 BunkumConsole.AllocateConsole();
 
