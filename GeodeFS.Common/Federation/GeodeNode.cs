@@ -4,6 +4,11 @@ namespace GeodeFS.Common.Federation;
 
 public class GeodeNode
 {
-    public virtual string Source { get; set; }
-    public virtual DateTimeOffset LastPing { get; set; }
+    public GeodeNode(string source)
+    {
+        Source = source;
+    }
+
+    public virtual string Source { get; }
+    public virtual DateTimeOffset LastPing { get; set; } = DateTimeOffset.Now;
 }
