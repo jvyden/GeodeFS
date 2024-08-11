@@ -6,15 +6,18 @@ namespace GeodeFS.Common.Networking;
 
 public class TcpNetworkBackend : NetworkBackend, IDisposable
 {
-    private const ushort Port = 36734;
+    public const ushort DefaultPort = 36734;
+    private readonly ushort _port;
 
     private readonly Socket _listener = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     private readonly List<TcpPeer> _peers = [];
 
-    public TcpNetworkBackend()
+    public TcpNetworkBackend(ushort port = DefaultPort)
     {
-        this._listener.Bind(new IPEndPoint(0, Port));
-        this._listener.Listen(100);
+        this._port = port;
+
+        this._listener.Bind(new IPEndPoint(0, this._port));
+        this._listener.Listen(100); // you just lost the game
 
         // ReSharper disable once UseObjectOrCollectionInitializer
         Task.Factory.StartNew(async () =>
@@ -38,7 +41,7 @@ public class TcpNetworkBackend : NetworkBackend, IDisposable
     public override void Handshake(string source)
     {
         Socket server = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        server.Connect(IPAddress.Parse(source), Port);
+        server.Connect(IPEndPoint.Parse(source));
 
         TcpPeer peer = new(this.FireOnPacket, server, false);
         this._peers.Add(peer);

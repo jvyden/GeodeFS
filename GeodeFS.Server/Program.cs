@@ -1,12 +1,16 @@
 ﻿using System.Reflection;
+using Bunkum.Core.Configuration;
 using GeodeFS.Common.Federation;
 using GeodeFS.Common.Networking;
 using GeodeFS.Server.Configuration;
 using GeodeFS.Server.Services;
 using NotEnoughLogs.Behaviour;
 
-FederationController controller = new(new TcpNetworkBackend());
-// controller.HandshakeWithNode("127.0.0.1");
+GeodeConfig config = Config.LoadFromJsonFile<GeodeConfig>("geode.json", new Logger());
+
+FederationController controller = new(new TcpNetworkBackend(config.ListenPort));
+foreach (string node in config.DirectPeers)
+    controller.HandshakeWithNode(node);
 
 BunkumConsole.AllocateConsole();
 
@@ -19,8 +23,7 @@ BunkumServer server = new BunkumHttpServer(new LoggerConfiguration
 server.Initialize = s =>
 {
     FileSystemDataStore dataStore = new();
-    
-    s.AddConfigFromJsonFile<GeodeConfig>("geode.json");
+    s.AddConfig(config);
 
     s.DiscoverEndpointsFromAssembly(Assembly.GetExecutingAssembly());
 
