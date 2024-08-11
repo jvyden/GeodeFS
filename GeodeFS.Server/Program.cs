@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using GeodeFS.Common.Federation;
-using GeodeFS.Common.Federation.Networking;
+using GeodeFS.Common.Networking;
 using GeodeFS.Server.Configuration;
 using GeodeFS.Server.Services;
 using NotEnoughLogs.Behaviour;

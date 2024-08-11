@@ -11,4 +11,6 @@ public class GeodeNode
 
     public virtual string Source { get; }
     public virtual DateTimeOffset LastPing { get; set; } = DateTimeOffset.Now;
+
+    public GeodeNodeRelations Relations { get; set; } = new();
 }

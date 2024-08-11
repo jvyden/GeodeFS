@@ -1,4 +1,4 @@
-namespace GeodeFS.Common.Federation.Networking;
+namespace GeodeFS.Common.Networking;
 
 public class InMemoryNetwork
 {
