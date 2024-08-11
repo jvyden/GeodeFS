@@ -53,7 +53,10 @@ public class BasicFederationTests
         Assert.Multiple(() =>
         {
             Assert.That(_controller1.Nodes.Count(n => n.Source == "3"), Is.EqualTo(1), "1 cant see 3");
+            Assert.That(_controller1.DirectNodes.Count(n => n.Source == "3"), Is.EqualTo(0), "1 can directly see 3");
+
             Assert.That(_controller3.Nodes.Count(n => n.Source == "1"), Is.EqualTo(1), "3 cant see 1");
+            Assert.That(_controller3.DirectNodes.Count(n => n.Source == "1"), Is.EqualTo(0), "3 can directly see 1");
         });
     }
     
@@ -68,7 +71,10 @@ public class BasicFederationTests
         Assert.Multiple(() =>
         {
             Assert.That(_controller1.Nodes.Count(n => n.Source == "3"), Is.EqualTo(1), "1 cant see 3");
+            Assert.That(_controller1.DirectNodes.Count(n => n.Source == "3"), Is.EqualTo(0), "1 can directly see 3");
+
             Assert.That(_controller3.Nodes.Count(n => n.Source == "1"), Is.EqualTo(1), "3 cant see 1");
+            Assert.That(_controller3.DirectNodes.Count(n => n.Source == "1"), Is.EqualTo(0), "3 can directly see 1");
         });
     }
 }
