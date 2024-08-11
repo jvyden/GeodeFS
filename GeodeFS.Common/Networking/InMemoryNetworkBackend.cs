@@ -19,8 +19,11 @@ public class InMemoryNetworkBackend : NetworkBackend
     {
         InMemoryNetworkBackend? backend = this._network.Clients.FirstOrDefault(c => c._source == destination);
 
-        Console.WriteLine($"{this._source}->{destination}: {packet.GetType().Name[6..]}");
-        backend?.ReceivePacket(this, packet);
+        _network.QueueTask(() =>
+        {
+            Console.WriteLine($"{this._source}->{destination}: {packet.GetType().Name[6..]}");
+            backend?.ReceivePacket(this, packet);
+        });
     }
 
     private void ReceivePacket(InMemoryNetworkBackend source, IPacket packet)

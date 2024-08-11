@@ -13,7 +13,7 @@ public class BasicFederationTests
     [SetUp]
     public void Setup()
     {
-        _network = new InMemoryNetwork();
+        _network = new InMemoryNetwork(false);
         
         _controller1 = new FederationController(new InMemoryNetworkBackend(_network));
         _controller2 = new FederationController(new InMemoryNetworkBackend(_network));
@@ -25,6 +25,8 @@ public class BasicFederationTests
     {
         // 1 -> 2
         _controller1.HandshakeWithNode("2");
+        
+        _network.ProcessTasks();
 
         Assert.Multiple(() =>
         {
@@ -49,6 +51,8 @@ public class BasicFederationTests
         // ^---------^
         _controller1.HandshakeWithNode("2");
         _controller2.HandshakeWithNode("3");
+        
+        _network.ProcessTasks();
 
         Assert.Multiple(() =>
         {
@@ -67,6 +71,8 @@ public class BasicFederationTests
         // ^---------^
         _controller1.HandshakeWithNode("2");
         _controller3.HandshakeWithNode("2");
+        
+        _network.ProcessTasks();
 
         Assert.Multiple(() =>
         {
