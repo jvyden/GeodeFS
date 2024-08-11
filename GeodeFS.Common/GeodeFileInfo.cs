@@ -1,13 +1,12 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace GeodeFS.Common;
 
 #nullable disable
 
+[MessagePackObject]
 public class GeodeFileInfo
 {
-    [MaxLength(Maximum.FileNameLength)]
+    [Key(0), MaxLength(Maximum.FileNameLength)]
     public string Name { get; set; }
-    [MaxLength(Maximum.FileTypeLength)]
+    [Key(1), MaxLength(Maximum.FileTypeLength)]
     public string Type { get; set; }
 }
