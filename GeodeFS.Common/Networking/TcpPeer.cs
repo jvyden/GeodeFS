@@ -9,7 +9,12 @@ public class TcpPeer : IDisposable
 {
     public TcpPeer(Action<string, IPacket> onRead, Socket socket, bool isClient)
     {
-        this.Source = ((IPEndPoint)socket.RemoteEndPoint!).Address.ToString();
+        IPEndPoint endpoint = (IPEndPoint)socket.RemoteEndPoint!;
+        this.Address = endpoint.Address.ToString();
+        // me when i am on the team for the .NET stdlib and i do not know about basic data types
+        // (i hate myself and i hate our users even more)
+        this.Port = (ushort)endpoint.Port;
+
         this.IsClient = isClient;
 
         this._socket = socket;
@@ -23,12 +28,13 @@ public class TcpPeer : IDisposable
             while (!this._disposed)
             {
                 IPacket packet = this.ReadPacket();
-                onRead(this.Source, packet);
+                onRead(this.Address, packet);
             }
         }, TaskCreationOptions.LongRunning);
     }
 
-    public readonly string Source;
+    public readonly string Address;
+    public readonly ushort Port;
     
     private readonly Socket _socket;
     private readonly NetworkStream _stream;

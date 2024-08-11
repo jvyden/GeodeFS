@@ -87,7 +87,7 @@ public class FederationController : IDisposable
     public void DiscoverNode(string source, GeodeNode newNode)
     {
         Debug.Assert(newNode is not GeodeLocalNode);
-        this._logger.LogTrace(GeodeCategory.Peer, "Discovered node {0}", newNode.Source);
+        this._logger.LogDebug(GeodeCategory.Peer, "Discovered node {0}", newNode.Source);
         
         foreach (GeodeNode node in this.DirectNodes)
         {

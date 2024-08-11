@@ -26,14 +26,17 @@ public class TcpNetworkBackend : NetworkBackend, IDisposable
             while (!_disposed)
             {
                 Socket client = await this._listener.AcceptAsync();
-                this._peers.Add(new TcpPeer(this.FireOnPacket, client, true));
+                TcpPeer peer = new(this.FireOnPacket, client, true);
+
+                this.Logger.LogInfo(GeodeCategory.Peer, "New peer connection from {0}:{1}", peer.Address, peer.Port);
+                this._peers.Add(peer);
             }
         }, TaskCreationOptions.LongRunning);
     }
 
     public override void SendPacket(string destination, IPacket packet)
     {
-        TcpPeer? peer = this._peers.FirstOrDefault(p => p.Source == destination);
+        TcpPeer? peer = this._peers.FirstOrDefault(p => p.Address == destination);
         ObjectDisposedException.ThrowIf(peer == null, destination);
         
         peer.SendPacket(packet);
@@ -42,10 +45,13 @@ public class TcpNetworkBackend : NetworkBackend, IDisposable
     public override void Handshake(string source)
     {
         Socket server = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        this.Logger.LogDebug(GeodeCategory.Peer, "Connecting to peer at {0}...", source);
         server.Connect(IPEndPoint.Parse(source));
 
         TcpPeer peer = new(this.FireOnPacket, server, false);
         this._peers.Add(peer);
+
+        this.Logger.LogInfo(GeodeCategory.Peer, "Connected to peer {0}:{1}, starting handshake.", peer.Address, peer.Port);
         
         peer.SendPacket(new PacketHandshake());
     }
