@@ -22,7 +22,7 @@ public class InMemoryNetworkBackend : NetworkBackend
 
         _network.QueueTask(() =>
         {
-            Console.WriteLine($"{this._source}->{destination}: {packet.GetType().Name[6..]}");
+            Logger.LogTrace(GeodeCategory.Peer, $"Sending packet {packet.GetType().Name[6..]} to {destination}");
             backend?.ReceivePacket(this, packet);
         });
     }

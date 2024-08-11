@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using GeodeFS.Common.Networking.Packets;
@@ -8,9 +9,8 @@ public class TcpPeer : IDisposable
 {
     public TcpPeer(Action<string, IPacket> onRead, Socket socket, bool isClient)
     {
-        this.Source = socket.RemoteEndPoint!.ToString()!;
+        this.Source = ((IPEndPoint)socket.RemoteEndPoint!).Address.ToString();
         this.IsClient = isClient;
-        Console.WriteLine(this.Source);
 
         this._socket = socket;
         this._stream = new NetworkStream(socket, false);
