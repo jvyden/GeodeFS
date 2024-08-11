@@ -1,7 +1,10 @@
 ﻿using System.Reflection;
+using GeodeFS.Common.Federation;
 using GeodeFS.Server.Configuration;
 using GeodeFS.Server.Services;
 using NotEnoughLogs.Behaviour;
+
+FederationController controller = new();
 
 BunkumConsole.AllocateConsole();
 
@@ -18,6 +21,9 @@ server.Initialize = s =>
     s.AddConfigFromJsonFile<GeodeConfig>("geode.json");
 
     s.DiscoverEndpointsFromAssembly(Assembly.GetExecutingAssembly());
+
+    s.AddService<FederationService>(controller);
+
     s.AddStorageService(dataStore);
     s.AddService<DataAccessService>(dataStore);
 };
