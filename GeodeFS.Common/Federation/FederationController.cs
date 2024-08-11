@@ -37,26 +37,7 @@ public class FederationController
             if(packet is not PacketHandshake)
                 throw new InvalidOperationException($"Cannot handle packets from an unknown node ({source} -> {this._networkBackend})");
 
-            node = new GeodeNode(source);
-            this.DirectNodes.Add(node);
-
-            if (!this._currentlyHandshakingWith.Remove(source))
-            {
-                // this client is connecting to us. send back a handshake to finish things up
-                this._networkBackend.SendPacket(node, new PacketHandshake());
-            }
-            
-            this.DiscoverNode(source, node);
-            
-            // tell the other side the current state
-            foreach (GeodeNode otherNode in this.Nodes)
-            {
-                if(node.Source == otherNode.Source)
-                    continue;
-
-                this._networkBackend.SendPacket(node, new PacketShareNode(otherNode));
-            }
-            
+            HandleHandshake(source);
             return;
         }
 
@@ -70,6 +51,29 @@ public class FederationController
                 break;
             default:
                 throw new NotImplementedException(packet.GetType().ToString());
+        }
+    }
+
+    private void HandleHandshake(string source)
+    {
+        GeodeNode node = new(source);
+        this.DirectNodes.Add(node);
+
+        if (!this._currentlyHandshakingWith.Remove(source))
+        {
+            // this client is connecting to us. send back a handshake to finish things up
+            this._networkBackend.SendPacket(node, new PacketHandshake());
+        }
+            
+        this.DiscoverNode(source, node);
+            
+        // tell the other side the current state
+        foreach (GeodeNode otherNode in this.Nodes)
+        {
+            if(node.Source == otherNode.Source)
+                continue;
+
+            this._networkBackend.SendPacket(node, new PacketShareNode(otherNode));
         }
     }
 
