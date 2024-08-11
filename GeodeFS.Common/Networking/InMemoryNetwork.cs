@@ -4,6 +4,8 @@ namespace GeodeFS.Common.Networking;
 
 public class InMemoryNetwork : IDisposable
 {
+    public readonly List<InMemoryNetworkBackend> Clients = [];
+    
     public InMemoryNetwork(bool automatic = true)
     {
         if (!automatic)
@@ -37,8 +39,6 @@ public class InMemoryNetwork : IDisposable
     {
         this._taskQueue.Enqueue(action);
     }
-
-    public readonly List<InMemoryNetworkBackend> Clients = [];
 
     private bool _disposed;
     public void Dispose()
