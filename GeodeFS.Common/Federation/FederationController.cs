@@ -1,11 +1,14 @@
 using System.Diagnostics;
 using GeodeFS.Common.Networking;
 using GeodeFS.Common.Networking.Packets;
+using NotEnoughLogs;
 
 namespace GeodeFS.Common.Federation;
 
-public class FederationController
+public class FederationController : IDisposable
 {
+    private readonly Logger _logger;
+    
     /// <summary>
     /// This node is us.
     /// </summary>
@@ -23,14 +26,18 @@ public class FederationController
 
     private readonly List<string> _currentlyHandshakingWith = [];
 
-    public FederationController(NetworkBackend networkBackend)
+    public FederationController(NetworkBackend networkBackend, Logger logger)
     {
-        _networkBackend = networkBackend;
+        this._networkBackend = networkBackend;
         networkBackend.OnPacket += HandlePacket;
+
+        this._logger = logger;
     }
 
     private void HandlePacket(string source, IPacket packet)
     {
+        this._logger.LogTrace(GeodeCategory.Peer, "Got packet {0} from peer {1}", packet.GetType().Name[6..], source);
+
         GeodeNode? node = this.Nodes.FirstOrDefault(n => n.Source == source);
         if (node == null)
         {
@@ -80,7 +87,7 @@ public class FederationController
     public void DiscoverNode(string source, GeodeNode newNode)
     {
         Debug.Assert(newNode is not GeodeLocalNode);
-        Console.WriteLine("Discovered node " + newNode.Source);
+        this._logger.LogTrace(GeodeCategory.Peer, "Discovered node {0}", newNode.Source);
         
         foreach (GeodeNode node in this.DirectNodes)
         {
@@ -93,8 +100,16 @@ public class FederationController
 
     public void HandshakeWithNode(string source)
     {
-        Console.WriteLine($"Handshaking with {source}");
+        this._logger.LogInfo(GeodeCategory.Peer, "Handshaking with peer {0}", source);
         this._currentlyHandshakingWith.Add(source);
         this._networkBackend.Handshake(source);
+    }
+
+    public void Dispose()
+    {
+        if (this._networkBackend is IDisposable disposable)
+            disposable.Dispose();
+        
+        GC.SuppressFinalize(this);
     }
 }

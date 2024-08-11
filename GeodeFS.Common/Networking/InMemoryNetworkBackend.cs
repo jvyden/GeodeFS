@@ -1,4 +1,5 @@
 using GeodeFS.Common.Networking.Packets;
+using NotEnoughLogs;
 
 namespace GeodeFS.Common.Networking;
 
@@ -7,7 +8,7 @@ public class InMemoryNetworkBackend : NetworkBackend
     private readonly InMemoryNetwork _network;
     private readonly string _source;
     
-    public InMemoryNetworkBackend(InMemoryNetwork network) : base()
+    public InMemoryNetworkBackend(InMemoryNetwork network, Logger logger) : base(logger)
     {
         this._network = network;
         this._network.Clients.Add(this);

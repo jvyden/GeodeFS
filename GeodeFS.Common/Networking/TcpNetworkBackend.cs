@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using GeodeFS.Common.Networking.Packets;
+using NotEnoughLogs;
 
 namespace GeodeFS.Common.Networking;
 
@@ -12,7 +13,7 @@ public class TcpNetworkBackend : NetworkBackend, IDisposable
     private readonly Socket _listener = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     private readonly List<TcpPeer> _peers = [];
 
-    public TcpNetworkBackend(ushort port = DefaultPort)
+    public TcpNetworkBackend(Logger logger, ushort port = DefaultPort) : base(logger)
     {
         this._port = port;
 

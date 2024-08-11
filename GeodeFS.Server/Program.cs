@@ -6,19 +6,20 @@ using GeodeFS.Server.Configuration;
 using GeodeFS.Server.Services;
 using NotEnoughLogs.Behaviour;
 
-GeodeConfig config = Config.LoadFromJsonFile<GeodeConfig>("geode.json", new Logger());
-
-FederationController controller = new(new TcpNetworkBackend(config.ListenPort));
-foreach (string node in config.DirectPeers)
-    controller.HandshakeWithNode(node);
-
 BunkumConsole.AllocateConsole();
-
 BunkumServer server = new BunkumHttpServer(new LoggerConfiguration
 {
     Behaviour = new QueueLoggingBehaviour(),
     MaxLevel = LogLevel.Trace
 });
+
+Logger logger = server.Logger;
+
+GeodeConfig config = Config.LoadFromJsonFile<GeodeConfig>("geode.json", logger);
+
+FederationController controller = new(new TcpNetworkBackend(logger, config.ListenPort), logger);
+foreach (string node in config.DirectPeers)
+    controller.HandshakeWithNode(node);
 
 server.Initialize = s =>
 {
