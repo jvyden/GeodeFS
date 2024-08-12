@@ -6,10 +6,10 @@
 public class GeodeUser
 {
     /// <summary>
-    /// SHA-256 hash of the <see cref="Pubkey"/>. Used for indexing/lookups
+    /// Fingerprint of the <see cref="Pubkey"/>. Used for indexing/lookups
     /// </summary>
-    [Key(0), MaxLength(64)]
-    public string PubkeyHash { get; set; }
+    [Key(0), MaxLength(40)]
+    public string PubkeyFingerprint { get; set; }
     
     [Key(1)]
     public string Pubkey { get; set; }

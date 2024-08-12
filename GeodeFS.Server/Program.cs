@@ -1,8 +1,10 @@
 ﻿using System.Reflection;
 using Bunkum.Core.Configuration;
+using Bunkum.Core.Responses.Serialization;
 using GeodeFS.Common.Federation;
 using GeodeFS.Common.Networking;
 using GeodeFS.Database;
+using GeodeFS.Server;
 using GeodeFS.Server.Configuration;
 using GeodeFS.Server.Services;
 using NotEnoughLogs.Behaviour;
@@ -34,6 +36,11 @@ server.Initialize = s =>
 
     s.AddStorageService(dataStore);
     s.AddService<DataAccessService>(dataStore);
+    
+    s.AddService<DebugService>();
+
+    s.RemoveSerializer<BunkumJsonSerializer>();
+    s.AddSerializer<GeodeJsonSerializer>();
 };
 
 server.Start();

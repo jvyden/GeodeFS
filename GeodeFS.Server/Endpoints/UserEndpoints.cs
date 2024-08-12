@@ -1,3 +1,4 @@
+using Bunkum.Core.Endpoints.Debugging;
 using GeodeFS.Api;
 using GeodeFS.Common;
 using GeodeFS.Common.Federation;
@@ -14,13 +15,13 @@ public class UserEndpoints : EndpointGroup
         if (!PgpHelper.VerifyUserMessage(body.Pubkey, body.Message, "register"))
             return null;
 
-        string hash = CryptoHelper.Sha256(body.Pubkey);
+        string fingerprint = PgpHelper.GetFingerprint(body.Pubkey);
         
         return new GeodeUser
         {
             OriginatingNode = node.Source,
             Pubkey = body.Pubkey,
-            PubkeyHash = hash,
+            PubkeyFingerprint = fingerprint,
         };
     }
 }
