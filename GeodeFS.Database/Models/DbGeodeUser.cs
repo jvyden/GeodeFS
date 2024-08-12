@@ -7,10 +7,10 @@ namespace GeodeFS.Database.Models;
 public class DbGeodeUser
 {
     /// <summary>
-    /// SHA-256 hash of the <see cref="Pubkey"/>. Used for indexing/lookups
+    /// Fingerprint of the <see cref="Pubkey"/>. Used for indexing/lookups
     /// </summary>
-    [Key, MaxLength(256 / 8 * 2)]
-    public string PubkeyHash { get; set; }
+    [Key, MaxLength(40)]
+    public string PubkeyFingerprint { get; set; }
     
     [MaxLength(8192)]
     public string Pubkey { get; set; }

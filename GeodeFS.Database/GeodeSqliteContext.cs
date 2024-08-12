@@ -8,6 +8,19 @@ namespace GeodeFS.Database;
 public class GeodeSqliteContext : DbContext, IDatabaseContext
 {
     private DbSet<DbGeodeUser> Users { get; set; }
+
+    public void AddUser(string pubkey, string fingerprint, string node)
+    {
+        DbGeodeUser user = new()
+        {
+            Pubkey = pubkey,
+            PubkeyFingerprint = fingerprint,
+            OriginatingNode = node,
+        };
+
+        Users.Add(user);
+        this.SaveChanges();
+    }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
