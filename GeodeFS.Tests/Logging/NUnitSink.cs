@@ -2,7 +2,7 @@ using System.Text;
 using NotEnoughLogs;
 using NotEnoughLogs.Sinks;
 
-namespace GeodeFS.Tests.Federation.Logging;
+namespace GeodeFS.Tests.Logging;
 
 public class NUnitSink : ILoggerSink
 {

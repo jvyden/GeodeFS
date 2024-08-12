@@ -1,5 +1,5 @@
 using GeodeFS.Common.Federation;
-using GeodeFS.Tests.Federation.Suites;
+using GeodeFS.Tests.Suites;
 
 namespace GeodeFS.Tests.Federation.Tests;
 

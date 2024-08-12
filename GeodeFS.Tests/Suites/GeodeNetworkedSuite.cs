@@ -1,7 +1,7 @@
 using GeodeFS.Common.Federation;
 using GeodeFS.Common.Networking;
 
-namespace GeodeFS.Tests.Federation.Suites;
+namespace GeodeFS.Tests.Suites;
 
 public abstract class GeodeNetworkedSuite : GeodeTestSuite
 {
@@ -15,7 +15,7 @@ public abstract class GeodeNetworkedSuite : GeodeTestSuite
 
     protected FederationController CreateController(int id)
     {
-        InMemoryNetworkBackend backend = new(this.Network, Proxy("net" + id));
-        return new FederationController(backend, Proxy("con" + id));
+        InMemoryNetworkBackend backend = new(this.Network, this.Proxy("net" + id));
+        return new FederationController(backend, this.Proxy("con" + id));
     }
 }

@@ -2,7 +2,7 @@ using NotEnoughLogs;
 using NotEnoughLogs.Behaviour;
 using NotEnoughLogs.Sinks;
 
-namespace GeodeFS.Tests.Federation.Logging;
+namespace GeodeFS.Tests.Logging;
 
 public class ProxyLogger : IDisposable
 {

@@ -1,10 +1,8 @@
-
-
-using GeodeFS.Tests.Federation.Logging;
+using GeodeFS.Tests.Logging;
 using NotEnoughLogs;
 using NotEnoughLogs.Behaviour;
 
-namespace GeodeFS.Tests.Federation.Suites;
+namespace GeodeFS.Tests.Suites;
 
 public abstract class GeodeTestSuite
 {
