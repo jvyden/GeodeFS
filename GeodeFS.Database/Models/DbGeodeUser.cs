@@ -9,7 +9,7 @@ public class DbGeodeUser
     /// <summary>
     /// SHA-256 hash of the <see cref="Pubkey"/>. Used for indexing/lookups
     /// </summary>
-    [Key, MaxLength(256 / 8)]
+    [Key, MaxLength(256 / 8 * 2)]
     public string PubkeyHash { get; set; }
     
     [MaxLength(8192)]

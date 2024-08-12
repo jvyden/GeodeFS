@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GeodeFS.Api\GeodeFS.Api.csproj" />
       <ProjectReference Include="..\GeodeFS.Common\GeodeFS.Common.csproj" />
       <ProjectReference Include="..\GeodeFS.Database\GeodeFS.Database.csproj" />
     </ItemGroup>
