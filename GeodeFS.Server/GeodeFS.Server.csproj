@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\GeodeFS.Common\GeodeFS.Common.csproj" />
+      <ProjectReference Include="..\GeodeFS.Database\GeodeFS.Database.csproj" />
     </ItemGroup>
 
     <ItemGroup>

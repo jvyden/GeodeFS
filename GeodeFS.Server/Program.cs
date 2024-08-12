@@ -2,6 +2,7 @@
 using Bunkum.Core.Configuration;
 using GeodeFS.Common.Federation;
 using GeodeFS.Common.Networking;
+using GeodeFS.Database;
 using GeodeFS.Server.Configuration;
 using GeodeFS.Server.Services;
 using NotEnoughLogs.Behaviour;
@@ -26,6 +27,7 @@ server.Initialize = s =>
     FileSystemDataStore dataStore = new();
     s.AddConfig(config);
 
+    s.UseDatabaseProvider(new GeodeDbProvider());
     s.DiscoverEndpointsFromAssembly(Assembly.GetExecutingAssembly());
 
     s.AddService<FederationService>(controller);
