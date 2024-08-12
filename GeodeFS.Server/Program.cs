@@ -20,7 +20,9 @@ Logger logger = server.Logger;
 
 GeodeConfig config = Config.LoadFromJsonFile<GeodeConfig>("geode.json", logger);
 
-FederationController controller = new(new TcpNetworkBackend(logger, config.ListenPort), logger);
+GeodeDbProvider db = new();
+
+FederationController controller = new(new TcpNetworkBackend(logger, config.ListenPort), logger, db.GetContext());
 foreach (string node in config.DirectPeers)
     controller.HandshakeWithNode(node);
 
@@ -29,7 +31,7 @@ server.Initialize = s =>
     FileSystemDataStore dataStore = new();
     s.AddConfig(config);
 
-    s.UseDatabaseProvider(new GeodeDbProvider());
+    s.UseDatabaseProvider(db);
     s.DiscoverEndpointsFromAssembly(Assembly.GetExecutingAssembly());
 
     s.AddService<FederationService>(controller);

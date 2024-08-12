@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using GeodeFS.Common.Networking;
 using GeodeFS.Common.Networking.Packets;
+using GeodeFS.Database;
 using NotEnoughLogs;
 
 namespace GeodeFS.Common.Federation;
@@ -26,12 +27,15 @@ public class FederationController : IDisposable
 
     private readonly List<string> _currentlyHandshakingWith = [];
 
-    public FederationController(NetworkBackend networkBackend, Logger logger)
+    private readonly GeodeSqliteContext? _database;
+
+    public FederationController(NetworkBackend networkBackend, Logger logger, GeodeSqliteContext? database = null)
     {
         this._networkBackend = networkBackend;
         networkBackend.OnPacket += HandlePacket;
 
         this._logger = logger;
+        this._database = database;
     }
 
     private void HandlePacket(string source, IPacket packet)
@@ -55,6 +59,13 @@ public class FederationController : IDisposable
                 {
                     Relations = shareNode.Relations,
                 });
+                break;
+            case PacketShareUser shareUser:
+                if (shareUser.User.OriginatingNode == "local")
+                    shareUser.User.OriginatingNode = source;
+                
+                this._database?.AddUser(shareUser.User.Pubkey, shareUser.User.PubkeyFingerprint, shareUser.User.OriginatingNode);
+                this.ShareUser(source, shareUser.User);
                 break;
             default:
                 throw new NotImplementedException(packet.GetType().ToString());
@@ -96,6 +107,15 @@ public class FederationController : IDisposable
         }
 
         this.Nodes.Add(newNode);
+    }
+
+    public void ShareUser(string source, GeodeUser user)
+    {
+        foreach (GeodeNode node in this.DirectNodes)
+        {
+            if (node.Source == source) continue;
+            this._networkBackend.SendPacket(node.Source, new PacketShareUser(user));
+        }
     }
 
     public void HandshakeWithNode(string source)

@@ -12,4 +12,8 @@
       <PackageReference Include="PgpCore" Version="6.5.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\GeodeFS.Database\GeodeFS.Database.csproj" />
+    </ItemGroup>
+
 </Project>

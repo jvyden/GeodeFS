@@ -11,7 +11,7 @@ public class UserEndpoints : EndpointGroup
 {
     [ApiEndpoint("register", HttpMethods.Post)]
     [NullStatusCode(Forbidden)]
-    public GeodeUser? CreateUser(RequestContext context, GeodeLocalNode node, GeodeSqliteContext database, RegistrationRequest body)
+    public GeodeUser? CreateUser(RequestContext context, FederationController con, GeodeSqliteContext database, RegistrationRequest body)
     {
         if (!PgpHelper.VerifyUserMessage(body.Pubkey, body.Message, "register"))
             return null;
@@ -20,12 +20,13 @@ public class UserEndpoints : EndpointGroup
 
         GeodeUser user = new()
         {
-            OriginatingNode = node.Source,
+            OriginatingNode = con.LocalNode.Source,
             Pubkey = body.Pubkey,
             PubkeyFingerprint = fingerprint,
         };
 
-        database.AddUser(user.Pubkey, user.PubkeyFingerprint, node.Source);
+        database.AddUser(user.Pubkey, user.PubkeyFingerprint, con.LocalNode.Source);
+        con.ShareUser(con.LocalNode.Source, user);
 
         return user;
     }

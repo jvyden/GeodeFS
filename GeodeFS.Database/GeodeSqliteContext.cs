@@ -1,3 +1,4 @@
+using Bunkum.Core;
 using Bunkum.Core.Database;
 using GeodeFS.Database.Models;
 using Microsoft.Data.Sqlite;
@@ -26,7 +27,7 @@ public class GeodeSqliteContext : DbContext, IDatabaseContext
     {
         string connectionString = new SqliteConnectionStringBuilder
         {
-            DataSource = "geode.db",
+            DataSource = Path.Combine(BunkumFileSystem.DataDirectory, "geode.db"),
             Mode = SqliteOpenMode.ReadWriteCreate
         }.ToString();
         
