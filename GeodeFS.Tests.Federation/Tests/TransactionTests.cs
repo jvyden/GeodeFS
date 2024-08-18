@@ -29,4 +29,17 @@ public class TransactionTests : GeodeNetworkedSuite
         PacketPong? result = this._controller2.PingOtherNode("1");
         Debug.Assert(result != null);
     }
+
+    [Test]
+    public void PingsAllNodes()
+    {
+        // set up third node
+        FederationController controller3 = CreateController(3);
+        controller3.HandshakeWithNode("1");
+        this.Network.ProcessTasks();
+
+        Dictionary<GeodeNode, PacketPong?> results = this._controller1.PingAllNodes();
+        Assert.That(results, Has.Count.EqualTo(2));
+        Assert.That(results.All(r => r.Value != null), Is.True);
+    }
 }

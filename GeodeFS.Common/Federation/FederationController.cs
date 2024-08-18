@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using GeodeFS.Common.Networking;
 using GeodeFS.Common.Networking.Packets;
@@ -128,14 +129,47 @@ public class FederationController : IDisposable
         this._networkBackend.Handshake(otherNode);
     }
 
-    public PacketPong? PingOtherNode(string otherNode)
+    private GeodeNode GetDirectNode(string otherNode)
     {
-        this._logger.LogDebug(GeodeCategory.Peer, "Pinging node {0}", otherNode);
         GeodeNode? node = this.DirectNodes.FirstOrDefault(n => n.Source == otherNode);
         if(node == null)
             throw new Exception("Not directly connected to node " + otherNode);
+
+        return node;
+    }
+
+    public PacketPong? PingOtherNode(string otherNode)
+    {
+        GeodeNode node = GetDirectNode(otherNode);
+        return PingOtherNode(node);
+    }
+    
+    private PacketPong? PingOtherNode(GeodeNode otherNode)
+    {
+        PacketPong? result = this._networkBackend.DoTransaction<PacketPong>(otherNode, new PacketPing());
+        otherNode.LastPing = DateTimeOffset.UtcNow;
+        return result;
+    }
+
+    public Dictionary<GeodeNode, PacketPong?> PingAllNodes()
+    {
+        ConcurrentDictionary<GeodeNode, PacketPong?> results = new();
         
-        return this._networkBackend.DoTransaction<PacketPong>(node, new PacketPing());
+        Task[] tasks = new Task[this.DirectNodes.Count];
+        for (int i = 0; i < this.DirectNodes.Count; i++)
+        {
+            GeodeNode node = this.DirectNodes[i];
+            Task task = Task.Run(() =>
+            {
+                PacketPong? result = this.PingOtherNode(node);
+                results.TryAdd(node, result);
+            });
+            tasks[i] = task;
+        }
+
+        Task.WaitAll(tasks.ToArray());
+
+        return results.ToDictionary();
     }
 
     public void Dispose()
