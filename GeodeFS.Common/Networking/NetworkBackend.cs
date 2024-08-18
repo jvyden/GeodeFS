@@ -26,20 +26,19 @@ public abstract class NetworkBackend
         where TResponse : class, ITransactionPacket
     {
         int id = Random.Shared.Next();
+        // int id = 1;
         packet.TransactionId = id;
         
         this.SendPacket(node, packet);
-        this.Logger.LogTrace(GeodeCategory.Transaction, $"Creating transaction {id}, and adding to requests");
+        this.Logger.LogTrace(GeodeCategory.Transaction, $"Starting transaction {id}");
         this.TransactionRequests.Add(id);
         
         Stopwatch sw = Stopwatch.StartNew();
         
         ITransactionPacket? response = null;
         
-        // while (sw.ElapsedMilliseconds < ITransactionPacket.MaxTransactionWaitMilliseconds)
-        while (true)
+        while (sw.ElapsedMilliseconds < ITransactionPacket.MaxTransactionWaitMilliseconds)
         {
-            this.Logger.LogTrace(GeodeCategory.Transaction, $"Waiting for completion of {id} for {sw.ElapsedMilliseconds}ms");
             TransactionResponse? resp = this.TransactionResponses.FirstOrDefault(r => r.Id == id & r.Source == node.Source);
             if (resp != null)
             {
@@ -51,7 +50,6 @@ public abstract class NetworkBackend
             Thread.Sleep(5);
         }
 
-        this.Logger.LogTrace(GeodeCategory.Transaction, $"Removing transaction {id} from requests");
         this.TransactionRequests.Remove(id);
         return response as TResponse;
     }
@@ -63,14 +61,14 @@ public abstract class NetworkBackend
         ITransactionPacket? transactionPacket = packet as ITransactionPacket;
         if (transactionPacket != null && this.TransactionRequests.Contains(transactionPacket.TransactionId))
         {
-            this.Logger.LogTrace(GeodeCategory.Transaction, $"Got transaction {transactionPacket.TransactionId}, adding to responses");
+            this.Logger.LogTrace(GeodeCategory.Transaction, $"Got response for transaction {transactionPacket.TransactionId}");
             this.TransactionResponses.Add(new TransactionResponse(source, transactionPacket));
             return;
         }
         
         if (transactionPacket != null)
         {
-            this.Logger.LogTrace(GeodeCategory.Transaction, $"Got start of transaction {transactionPacket.TransactionId}");
+            this.Logger.LogTrace(GeodeCategory.Transaction, $"Got request for transaction {transactionPacket.TransactionId}");
         }
 
         OnPacket?.Invoke(source, packet);
