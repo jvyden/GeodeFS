@@ -4,7 +4,7 @@ using NotEnoughLogs.Behaviour;
 
 namespace GeodeFS.Tests.Suites;
 
-public abstract class GeodeTestSuite
+public abstract class GeodeTestSuite : IDisposable
 {
     private readonly Logger _logger = new([new NUnitSink()], new LoggerConfiguration
     {
@@ -13,4 +13,10 @@ public abstract class GeodeTestSuite
     });
 
     protected Logger Proxy(string name) => new ProxyLogger(this._logger, name);
+
+    public void Dispose()
+    {
+        this._logger.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }

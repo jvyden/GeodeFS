@@ -151,9 +151,10 @@ public class FederationController : IDisposable
         return result;
     }
 
-    public Dictionary<GeodeNode, PacketPong?> PingAllNodes()
+    private Dictionary<GeodeNode, TResponse?> DoTransactionForAll<TResponse>(Func<ITransactionPacket> packetCreator)
+        where TResponse : class, ITransactionPacket
     {
-        ConcurrentDictionary<GeodeNode, PacketPong?> results = new();
+        ConcurrentDictionary<GeodeNode, TResponse?> results = new();
         
         Task[] tasks = new Task[this.DirectNodes.Count];
         for (int i = 0; i < this.DirectNodes.Count; i++)
@@ -161,16 +162,44 @@ public class FederationController : IDisposable
             GeodeNode node = this.DirectNodes[i];
             Task task = Task.Run(() =>
             {
-                PacketPong? result = this.PingOtherNode(node);
+                TResponse? result = this._networkBackend.DoTransaction<TResponse>(node, packetCreator());
                 results.TryAdd(node, result);
             });
             tasks[i] = task;
         }
 
-        Task.WaitAll(tasks.ToArray());
+        Task.WaitAll(tasks);
 
         return results.ToDictionary();
     }
+    
+    private TResponse? DoTransactionForFirstResponse<TResponse>(Func<ITransactionPacket> packetCreator)
+        where TResponse : class, ITransactionPacket
+    {
+        List<Task<TResponse?>> tasks = new(this.DirectNodes.Count);
+        foreach (GeodeNode node in this.DirectNodes)
+        {
+            Task<TResponse?> task = Task.Run(() => this._networkBackend.DoTransaction<TResponse>(node, packetCreator()));
+            tasks.Add(task);
+        }
+        
+        TResponse? response = null;
+        while (response == null && tasks.Count > 0)
+        {
+            Task<TResponse?> task = Task.WhenAny(tasks).Result;
+            if (task.Result == null)
+            {
+                tasks.Remove(task);
+                continue;
+            }
+            
+            return task.Result;
+        }
+
+        return null;
+    }
+
+    public Dictionary<GeodeNode, PacketPong?> PingAllNodes() => DoTransactionForAll<PacketPong>(() => new PacketPing());
 
     public void Dispose()
     {
