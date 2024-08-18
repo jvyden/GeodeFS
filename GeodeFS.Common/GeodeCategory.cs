@@ -4,4 +4,5 @@ public enum GeodeCategory : byte
 {
     Federation,
     Peer,
+    Transaction
 }

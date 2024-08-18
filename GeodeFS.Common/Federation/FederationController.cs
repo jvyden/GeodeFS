@@ -67,6 +67,9 @@ public class FederationController : IDisposable
                 this._database?.AddUser(shareUser.User.Pubkey, shareUser.User.PubkeyFingerprint, shareUser.User.OriginatingNode);
                 this.ShareUser(source, shareUser.User);
                 break;
+            case PacketPing ping:
+                this._networkBackend.SendPacket(source, new PacketPong(ping.TransactionId));
+                break;
             default:
                 throw new NotImplementedException(packet.GetType().ToString());
         }
@@ -118,11 +121,21 @@ public class FederationController : IDisposable
         }
     }
 
-    public void HandshakeWithNode(string source)
+    public void HandshakeWithNode(string otherNode)
     {
-        this._logger.LogInfo(GeodeCategory.Peer, "Handshaking with peer {0}", source);
-        this._currentlyHandshakingWith.Add(source);
-        this._networkBackend.Handshake(source);
+        this._logger.LogInfo(GeodeCategory.Peer, "Handshaking with peer {0}", otherNode);
+        this._currentlyHandshakingWith.Add(otherNode);
+        this._networkBackend.Handshake(otherNode);
+    }
+
+    public PacketPong? PingOtherNode(string otherNode)
+    {
+        this._logger.LogDebug(GeodeCategory.Peer, "Pinging node {0}", otherNode);
+        GeodeNode? node = this.DirectNodes.FirstOrDefault(n => n.Source == otherNode);
+        if(node == null)
+            throw new Exception("Not directly connected to node " + otherNode);
+        
+        return this._networkBackend.DoTransaction<PacketPong>(node, new PacketPing());
     }
 
     public void Dispose()
