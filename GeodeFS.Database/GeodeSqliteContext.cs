@@ -9,6 +9,17 @@ namespace GeodeFS.Database;
 public class GeodeSqliteContext : DbContext, IDatabaseContext
 {
     private DbSet<DbGeodeUser> Users { get; set; }
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        string connectionString = new SqliteConnectionStringBuilder
+        {
+            DataSource = Path.Combine(BunkumFileSystem.DataDirectory, "geode.db"),
+            Mode = SqliteOpenMode.ReadWriteCreate
+        }.ToString();
+        
+        optionsBuilder.UseSqlite(connectionString);
+    }
 
     public void AddUser(string pubkey, string fingerprint, string node)
     {
@@ -22,15 +33,9 @@ public class GeodeSqliteContext : DbContext, IDatabaseContext
         Users.Add(user);
         this.SaveChanges();
     }
-    
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+
+    public DbGeodeUser? GetUserByFingerprint(string fingerprint)
     {
-        string connectionString = new SqliteConnectionStringBuilder
-        {
-            DataSource = Path.Combine(BunkumFileSystem.DataDirectory, "geode.db"),
-            Mode = SqliteOpenMode.ReadWriteCreate
-        }.ToString();
-        
-        optionsBuilder.UseSqlite(connectionString);
+        return this.Users.FirstOrDefault(u => u.PubkeyFingerprint == fingerprint);
     }
 }

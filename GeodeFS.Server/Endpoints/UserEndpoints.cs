@@ -4,6 +4,7 @@ using GeodeFS.Common;
 using GeodeFS.Common.Federation;
 using GeodeFS.Common.Verification;
 using GeodeFS.Database;
+using GeodeFS.Database.Models;
 
 namespace GeodeFS.Server.Endpoints;
 
@@ -29,5 +30,14 @@ public class UserEndpoints : EndpointGroup
         con.ShareUser(con.LocalNode.Source, user);
 
         return user;
+    }
+
+    [ApiEndpoint("user/{fingerprint}")]
+    public GeodeUser? GetUser(RequestContext context, GeodeSqliteContext database, string fingerprint)
+    {
+        DbGeodeUser? user = database.GetUserByFingerprint(fingerprint);
+        if (user == null) return null;
+
+        return new GeodeUser(user);
     }
 }

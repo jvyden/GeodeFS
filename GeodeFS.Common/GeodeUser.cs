@@ -1,10 +1,22 @@
-﻿namespace GeodeFS.Common;
+﻿using GeodeFS.Database.Models;
+
+namespace GeodeFS.Common;
 
 #nullable disable
 
 [MessagePackObject]
 public class GeodeUser
 {
+    public GeodeUser()
+    {}
+
+    public GeodeUser(DbGeodeUser user)
+    {
+        this.PubkeyFingerprint = user.PubkeyFingerprint;
+        this.Pubkey = user.Pubkey;
+        this.OriginatingNode = user.OriginatingNode;
+    }
+
     /// <summary>
     /// Fingerprint of the <see cref="Pubkey"/>. Used for indexing/lookups
     /// </summary>
